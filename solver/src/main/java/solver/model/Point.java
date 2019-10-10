@@ -8,7 +8,9 @@ public class Point {
     private int id;
     private int x;
     private int y;
-    private int processingTime = 1;
+    private int processingTime = 10;
+    private int score;
+    private boolean dropPoint;
 
     private Set<Connections> connections = new HashSet<>();
 
@@ -55,6 +57,30 @@ public class Point {
 
     public void addConnection(Connections connection) {
         connections.add(connection);
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public Set<Connections> getConnections() {
+        return connections;
+    }
+
+    public void setConnections(Set<Connections> connections) {
+        this.connections = connections;
+    }
+
+    public boolean isDropPoint() {
+        return dropPoint;
+    }
+
+    public void setDropPoint(boolean dropPoint) {
+        this.dropPoint = dropPoint;
     }
 
     @Override

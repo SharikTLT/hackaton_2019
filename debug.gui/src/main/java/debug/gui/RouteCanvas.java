@@ -17,8 +17,8 @@ public class RouteCanvas extends JPanel {
     }
 
     @Override
-    public void paint(Graphics graphics) {
-        super.paint(graphics);
+    public void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);
 
         //clear(graphics);
         drawPoints(graphics);

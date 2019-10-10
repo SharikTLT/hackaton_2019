@@ -40,4 +40,48 @@ public class Connections {
 
         return Objects.hash(pointA, pointB, distance);
     }
+
+    public Point getConnected(Point current){
+        return current.equals(pointA) ? pointB : pointA;
+    }
+
+    public Point getPointA() {
+        return pointA;
+    }
+
+    public void setPointA(Point pointA) {
+        this.pointA = pointA;
+    }
+
+    public Point getPointB() {
+        return pointB;
+    }
+
+    public void setPointB(Point pointB) {
+        this.pointB = pointB;
+    }
+
+    public long getDistance() {
+        return distance;
+    }
+
+    public void setDistance(long distance) {
+        this.distance = distance;
+    }
+
+    public double getFeromoneAtoB() {
+        return feromoneAtoB;
+    }
+
+    public void setFeromoneAtoB(double feromoneAtoB) {
+        this.feromoneAtoB = feromoneAtoB;
+    }
+
+    public double getFeromoneBtoA() {
+        return feromoneBtoA;
+    }
+
+    public void setFeromoneBtoA(double feromoneBtoA) {
+        this.feromoneBtoA = feromoneBtoA;
+    }
 }

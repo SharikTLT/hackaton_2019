@@ -10,12 +10,15 @@ public class Main {
         System.setProperty("sun.awt.noerasebackground", "true");
         Map map = new Map();
         RandomPointsGenerator randomPointsGenerator = new RandomPointsGenerator(123L);
-        randomPointsGenerator.generateMap(map, 5, 10, 10);
+        randomPointsGenerator.generateMap(map, 20, 500, 500);
         map.calculateMap();
 
         RouteCanvas routeCanvas = new RouteCanvas(map);
         JFrame frame = getjFrame();
         frame.add(routeCanvas);
+        frame.revalidate();
+        frame.repaint();
+        //routeCanvas.setVisible(true);
         boolean run = false;
         while (run){
             try {
@@ -25,7 +28,7 @@ public class Main {
                 run = false;
             }
             synchronized (map.getPoints()) {
-                randomPointsGenerator.generateMap(map, 500, 780, 750);
+                randomPointsGenerator.generateMap(map, 10, 200, 200);
             }
             routeCanvas.repaint();
         }
@@ -34,7 +37,7 @@ public class Main {
     private static JFrame getjFrame() {
         JFrame frame = new JFrame("Debug GUI");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 800);
+        frame.setSize(500, 500);
         frame.setVisible(true);
         return frame;
     }
