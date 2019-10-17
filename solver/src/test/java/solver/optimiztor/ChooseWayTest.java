@@ -1,12 +1,10 @@
 package solver.optimiztor;
 
-import org.testng.annotations.Test;
 import solver.model.Map;
 
 
 public class ChooseWayTest {
 
-    @Test
     public void testGetNext() {
         OptimizationContext optimizationContext = new OptimizationContext();
         getTestMap();

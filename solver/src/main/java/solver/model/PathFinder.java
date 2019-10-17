@@ -29,7 +29,7 @@ public class PathFinder {
         for (int i = 0; i < antNumber; ++i) {
             Path candidatePath = getRegularAntPath(startPoint);
         }
-
+    return null;
     }
 
     private Path getRegularAntPath(Point startPoint) {
@@ -52,6 +52,7 @@ public class PathFinder {
             currentPoint = action.getPoint();
             if (action.getType() == PathActions.Type.END) ;
         }
+        return null;
 
     }
 

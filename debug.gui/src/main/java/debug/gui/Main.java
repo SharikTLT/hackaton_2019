@@ -19,16 +19,16 @@ public class Main {
         frame.revalidate();
         frame.repaint();
         //routeCanvas.setVisible(true);
-        boolean run = false;
+        boolean run = true;
         while (run){
             try {
-                Thread.sleep(100);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 run = false;
             }
             synchronized (map.getPoints()) {
-                randomPointsGenerator.generateMap(map, 10, 200, 200);
+                randomPointsGenerator.generateMap(map, 20, 500, 500);
             }
             routeCanvas.repaint();
         }

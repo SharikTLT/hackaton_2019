@@ -8,6 +8,6 @@ public class ChooseWay {
 
     public PathActions getNext(OptimizationContext context){
 
-        return PathActions.stop(context.getCurrentPoint());
+        return null;//PathActions.stop(context.getCurrentPoint());
     }
 }

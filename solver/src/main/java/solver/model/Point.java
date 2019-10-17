@@ -98,4 +98,12 @@ public class Point {
 
         return Objects.hash(id, x, y);
     }
+
+    @Override
+    public String toString() {
+        return "Point{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

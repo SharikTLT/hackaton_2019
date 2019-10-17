@@ -1,5 +1,6 @@
 package solver.generator;
 
+import solver.model.Connections;
 import solver.model.Map;
 import solver.model.Point;
 
@@ -45,7 +46,7 @@ public class ExampleMap {
 
     private static void buildConnections(Point ... points) {
         for (int i = 1; i < points.length; i++) {
-            points[0].linkPoints(points[i]);
+            points[0].addConnection(new Connections(points[0], points[i]));
         }
     }
 
