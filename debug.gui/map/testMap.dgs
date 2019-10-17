@@ -1,0 +1,30 @@
+DGS004
+TestGraph 0 0
+an B label:Bank
+an n1  label:n1
+an n2  label:n2
+an n3  label:n3
+an n4  label:n4
+an n5  label:n5
+an n6  label:n6
+an n7  label:n7
+an n8  label:n8
+an n9  label:n9
+an n10  label:n10
+ae Bn1 B n1 weight:10.
+ae Bn2 B n2 weight:15.
+ae Bn3 B n3 weight:12.
+ae n1n4 n1 n4 weight:5.
+ae n1n5 n1 n5 weight:6.
+ae n2n5 n2 n5 weight:2.
+ae n3n6 n3 n6 weight:8.
+ae n5n6 n5 n6 weight:2.
+ae n5n7 n5 n7 weight:1.
+ae n5n8 n5 n8 weight:9.
+ae n7n8 n7 n8 weight:5.
+ae n8n9 n8 n9 weight:7.
+ae n8n19 n8 n10 weight:6.
+ae n3n8 n3 n8 weight:4.
+ae n2n6 n2 n6 weight:3.
+ae n6n8 n6 n8 weight:10.
+ae n4n7 n4 n7 weight:20.
