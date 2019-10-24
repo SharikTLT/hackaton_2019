@@ -27,7 +27,9 @@ public class ExternalGraphBuilder implements GraphBuilder {
         pointMap.get(api.getPointList().get(1)).setDropPoint(true);
 
         api.getRouteList().stream().forEach(r->{
-            graph.addEdge(pointMap.get(r.getA()), pointMap.get(r.getB()), new EdgeModel(r.getTime()));
+            PointModel a = pointMap.get(r.getA());
+            PointModel b = pointMap.get(r.getB());
+            graph.addEdge(a, b, new EdgeModel(r.getTime(), a, b));
         });
 
         return graph;
