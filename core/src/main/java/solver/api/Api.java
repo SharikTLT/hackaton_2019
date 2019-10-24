@@ -1,6 +1,8 @@
 package solver.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ public class Api {
     public static final String WS_SOCKET = "ws://socket";
 
     public static final String INIT_URL = "/init";
+    public static final String KEY_FORMAT = "%d_%d";
 
     private String teamName;
 
@@ -33,16 +36,21 @@ public class Api {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    @Getter
     private volatile List<Point> pointList;
     private volatile boolean pointsReady = false;
 
+    @Getter
     private volatile List<Route> routeList;
     private volatile boolean routesReady = false;
 
-    private volatile Map<String,Double> trafficList;
+    @Getter
+    private volatile Map<String,Double> trafficMap;
     private volatile boolean trafficReady = false;
 
+    @Getter
     private volatile Map<String, Car> carMap = new ConcurrentHashMap<>();
+
     private volatile Long level;
 
     public Api(String teamName) throws Exception {
@@ -64,6 +72,18 @@ public class Api {
         }
     }
 
+    public void goTo(String car, Long target, boolean noMoney) throws JsonProcessingException {
+        carMap.get(car).target = target;
+        if(noMoney){
+            send(ApiOutput.goTo(target, car, true));
+        }else {
+            send(ApiOutput.goTo(target, car));
+        }
+    }
+
+    public void send(ApiOutput input) throws JsonProcessingException {
+        ws.send(objectMapper.writeValueAsString(input));
+    }
 
     public void onMessage(String message) {
         try {
@@ -90,8 +110,12 @@ public class Api {
     private void parseTraffic(List<Traffic> trafficList) {
         for (Traffic traffic : trafficList) {
             String key = getTrafficKey(traffic.getA(), traffic.getB());
-
+            trafficMap.put(key, traffic.getJam());
         }
+    }
+
+    private String getTrafficKey(Long a, Long b) {
+        return a < b ? String.format(KEY_FORMAT, a, b) : String.format(KEY_FORMAT, b, a);
     }
 
     private WebSocketClient startWs(final Api self) throws URISyntaxException {

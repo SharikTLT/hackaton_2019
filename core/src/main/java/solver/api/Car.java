@@ -14,12 +14,12 @@ public class Car {
     @Getter
     @Setter
     @EqualsAndHashCode.Exclude
-    Long currentPoint;
+    volatile long currentPoint;
 
     @Getter
     @Setter
     @EqualsAndHashCode.Exclude
-    Long target;
+    volatile long target;
 
     public Car(String id) {
         this.id = id;
@@ -29,5 +29,9 @@ public class Car {
         this.id = car;
         this.currentPoint = i;
         this.target = i;
+    }
+
+    public boolean notRun() {
+        return currentPoint != target;
     }
 }
