@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import solver.api.dto.Point;
 import solver.api.dto.Route;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,8 @@ public class TestApi implements Api {
 
     @Override
     public Map<String, Car> getCarMap() {
-        return null;
+        Map<String, Car> carMap = new HashMap<>();
+        carMap.put("sb1", new Car("sb1", 0));
+        return carMap;
     }
 }
