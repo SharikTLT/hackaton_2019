@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import solver.Solver;
 import solver.api.dto.ApiInput;
 import solver.api.dto.Point;
 import solver.api.dto.Route;
@@ -23,7 +24,7 @@ public class ExampleApi extends AbstractApi {
     private Map<String,Car> carMap = new HashMap<>();
 
     public ExampleApi() throws IOException {
-        File res = new File("src/test/resources/example.json");
+        File res = new File("src/test/resources/example_easier.json");
         ApiInput input = new ObjectMapper().readValue(res, ApiInput.class);
         this.routeList = input.getRoutes();
         this.pointList = input.getPoints();
@@ -64,5 +65,10 @@ public class ExampleApi extends AbstractApi {
     @Override
     public Map<String, Car> getCarMap() {
         return carMap;
+    }
+
+    @Override
+    public void setSolver(Solver solver) {
+
     }
 }
