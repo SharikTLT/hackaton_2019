@@ -37,6 +37,10 @@ public class Solver {
     @Setter
     private boolean run = true;
 
+    @Getter
+    @Setter
+    private volatile long score;
+
     private volatile boolean ready = false;
 
 
@@ -71,7 +75,9 @@ public class Solver {
             }
         }
         for (Map.Entry<String, Car> entry : api.getCarMap().entrySet()) {
-            entry.getValue().setCurrentVertex(garagePoint);
+            Car car = entry.getValue();
+            car.setMaxLoad(100_000L);
+            car.setCurrentVertex(garagePoint);
         }
         ready = true;
         solve();

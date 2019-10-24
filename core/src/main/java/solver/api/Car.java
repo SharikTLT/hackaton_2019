@@ -4,10 +4,17 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.jgrapht.GraphPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import solver.model.PointModel;
+
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @EqualsAndHashCode
 public class Car {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Car.class);
 
     @Getter
     @Setter
@@ -51,6 +58,8 @@ public class Car {
     @Setter
     volatile private GraphPath plannedPath;
 
+    volatile ConcurrentLinkedQueue<Long> path = new ConcurrentLinkedQueue<Long>();
+
 
     public Car(String id) {
         this.id = id;
@@ -76,7 +85,7 @@ public class Car {
         if (currentLoad > maxLoad / greedFactor) {
             isGreed = false;
         }
-        if (currentLoad == maxLoad) {
+        if (currentLoad >= maxLoad) {
             isNeedDrop = true;
         }
     }
@@ -88,7 +97,17 @@ public class Car {
     }
 
     public void reachTarget() {
+        path.add(target);
+        LOGGER.info(path.toString());
         currentPoint = target;
         currentVertex = targetVertext;
+        currentLoad += targetVertext.getMoney();
+        if(currentVertex.isDropPoint()){
+            drop();
+        }
+    }
+
+    public boolean canLoad(long money) {
+        return currentLoad + money <= maxLoad;
     }
 }

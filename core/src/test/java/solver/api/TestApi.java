@@ -46,4 +46,9 @@ public class TestApi implements Api {
     public void setSolver(Solver solver) {
 
     }
+
+    @Override
+    public double getTime(long id, long id1) {
+        return 1;
+    }
 }

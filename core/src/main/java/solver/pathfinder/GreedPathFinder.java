@@ -25,6 +25,10 @@ public class GreedPathFinder implements PathFinder {
                 .sorted(Comparator.comparing((e -> e.getTime())))
                 .limit(1)
                 .findFirst();
+
+        if(!first.isPresent()){
+            return null;
+        }
         EdgeModel edgeModel = first.get();
         return edgeModel.getConnected(car.getCurrentVertex());
     }

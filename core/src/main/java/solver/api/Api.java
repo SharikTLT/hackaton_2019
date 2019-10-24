@@ -17,4 +17,6 @@ public interface Api {
     java.util.Map<String, Car> getCarMap();
 
     void setSolver(Solver solver);
+
+    double getTime(long id, long id1);
 }

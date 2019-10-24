@@ -10,6 +10,7 @@ import solver.api.dto.Point;
 import solver.model.EdgeModel;
 import solver.model.PointModel;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,13 +26,20 @@ public class SafePathFinder implements PathFinder {
         }
         shortPathAlgo = new DijkstraShortestPath(solver.getGraph());
 
-        solver.getGraph().edgesOf(car.getCurrentVertex()).stream()
-                .filter((EdgeModel e) -> !e.getConnected(car.getCurrentVertex()).isProcessed())
-                .sorted(Comparator.comparing(e -> {
+        Object[] candidates = solver.getGraph().edgesOf(car.getCurrentVertex()).stream()
 
-                    return getLengthOfShortest(e.getConnected(car.getCurrentVertex()), solver.getBankPoint());
-                }));
-        return null;
+                .map(e -> e.getConnected(car.getCurrentVertex()))
+                .filter(p -> !p.isProcessed())
+                .sorted(Comparator.comparing(e -> getLengthOfShortest(e, solver.getBankPoint())))
+                .toArray();
+        Object[] edges = Arrays.stream(candidates)
+                .filter(p->car.canLoad(((PointModel)p).getMoney()))
+                .toArray();
+        if(edges.length == 0){
+            return getShortPathTo(solver, car);
+        }
+        PointModel connected = ((PointModel) edges[0]);
+        return connected;
     }
 
     private Long getLengthOfShortest(PointModel connected, PointModel bankPoint) {

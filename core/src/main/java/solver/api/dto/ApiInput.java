@@ -7,19 +7,24 @@ import solver.model.PointModel;
 import java.util.List;
 
 public class ApiInput {
-    @Getter @Setter
+    @Getter
+    @Setter
     List<Route> routes;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     List<Traffic> traffic;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     List<Point> points;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     Long point;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     String car;
 
     @Getter
@@ -37,5 +42,9 @@ public class ApiInput {
     @Getter
     @Setter
     Long carsum;
+
+    @Getter
+    @Setter
+    Long teamsum;
 
 }

@@ -37,7 +37,8 @@ public class ExternalApi extends AbstractApi implements Api {
 
     private WebSocketClient ws;
 
-    private ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);;
+    private ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    ;
 
     @Getter
     private volatile List<Point> pointList;
@@ -48,7 +49,7 @@ public class ExternalApi extends AbstractApi implements Api {
     private volatile boolean routesReady = false;
 
     @Getter
-    private volatile Map<String,Double> trafficMap = new ConcurrentHashMap<>();
+    private volatile Map<String, Double> trafficMap = new ConcurrentHashMap<>();
     private volatile boolean trafficReady = false;
 
     @Getter
@@ -60,10 +61,12 @@ public class ExternalApi extends AbstractApi implements Api {
     @Setter
     private volatile Solver solver;
 
+    private final String url;
+
     public ExternalApi(String teamName, String initUrl) throws Exception {
         this.teamName = teamName;
-        ws = startWs(this, initUrl);
-        ws.connect();
+        this.url = initUrl;
+        restartWs();
         LOGGER.info("Start solver");
     }
 
@@ -76,9 +79,9 @@ public class ExternalApi extends AbstractApi implements Api {
     @Override
     public void goTo(String car, Long target, boolean noMoney) throws JsonProcessingException {
         carMap.get(car).target = target;
-        if(noMoney){
+        if (noMoney) {
             send(ApiOutput.goTo(target, car, true));
-        }else {
+        } else {
             send(ApiOutput.goTo(target, car));
         }
     }
@@ -114,30 +117,43 @@ public class ExternalApi extends AbstractApi implements Api {
             this.trafficReady = true;
         }
 
-        if(input.getToken() != null){
+        if (input.getToken() != null) {
             this.token = input.getToken();
             parseCars(input.getCars());
         }
-        if(input.getCar()!= null){
+        if (input.getCar() != null) {
             onCarMessage(input);
         }
 
-        if(isReady() && solver != null) {
+        if (input.getTeamsum() != null) {
+            solver.setScore(input.getTeamsum());
+        }
+
+        if (isReady() && solver != null) {
             solver.solve();
         }
     }
 
     private void onCarMessage(ApiInput input) {
         Car car = this.getCarMap().get(input.getCar());
-        car.setCurrentLoad(input.getCarsum());
-        car.updateLoad();
+        //car.setCurrentLoad(input.getCarsum());
         car.reachTarget();
+        car.updateLoad();
     }
 
     protected void parseTraffic(List<Traffic> trafficList) {
         for (Traffic traffic : trafficList) {
             String key = getTrafficKey(traffic.getA(), traffic.getB());
             trafficMap.put(key, traffic.getJam());
+        }
+    }
+
+    private void restartWs() {
+        try {
+            ws = startWs(this, url);
+            ws.connect();
+        } catch (URISyntaxException e) {
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -148,7 +164,11 @@ public class ExternalApi extends AbstractApi implements Api {
             public void onOpen(ServerHandshake serverHandshake) {
                 LOGGER.info("Connected");
                 try {
-                    self.send(ApiOutput.init(teamName));
+                    if (self.token == null) {
+                        self.send(ApiOutput.init(teamName));
+                    } else {
+                        self.send(ApiOutput.reconnect(token));
+                    }
                 } catch (JsonProcessingException e) {
                     LOGGER.error(e.getMessage(), e);
                 }
@@ -166,11 +186,21 @@ public class ExternalApi extends AbstractApi implements Api {
             @Override
             public void onClose(int i, String s, boolean b) {
                 LOGGER.error("Closed {} {} {}", i, s, b);
+                reconnectToRace();
             }
 
             @Override
             public void onError(Exception e) {
                 LOGGER.error(e.getMessage(), e);
+                reconnectToRace();
+            }
+
+            private void reconnectToRace() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                }
+                self.restartWs();
             }
         };
     }
@@ -178,5 +208,10 @@ public class ExternalApi extends AbstractApi implements Api {
     @Override
     public boolean isReady() {
         return trafficReady && routesReady && pointsReady && token != null;
+    }
+
+    @Override
+    public double getTime(long id, long id1) {
+        return trafficMap.get(getTrafficKey(id, id1));
     }
 }

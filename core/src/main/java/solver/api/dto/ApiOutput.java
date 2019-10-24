@@ -22,7 +22,7 @@ public class ApiOutput {
 
     @Getter
     @Setter
-    String token;
+    String reconnect;
 
     @Getter
     @Setter
@@ -42,8 +42,8 @@ public class ApiOutput {
         this.nomoney = nomoney;
     }
 
-    public ApiOutput(String token) {
-        this.token = token;
+    public ApiOutput(String reconnect) {
+        this.reconnect = reconnect;
     }
 
     public static ApiOutput goTo(Long point, String car) {

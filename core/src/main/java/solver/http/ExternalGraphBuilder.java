@@ -31,7 +31,7 @@ public class ExternalGraphBuilder implements GraphBuilder {
         api.getRouteList().stream().forEach(r -> {
             PointModel a = pointMap.get(r.getA());
             PointModel b = pointMap.get(r.getB());
-            graph.addEdge(a, b, new EdgeModel(r.getTime(), a, b));
+            graph.addEdge(a, b, new EdgeModel(r.getTime(), a, b, api));
         });
 
         return graph;
