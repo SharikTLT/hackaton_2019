@@ -36,6 +36,10 @@ public class Car {
     volatile PointModel currentVertex;
 
     @Getter
+    @Setter
+    volatile PointModel targetVertext;
+
+    @Getter
     volatile boolean isGreed = true;
 
     @Getter
@@ -81,5 +85,10 @@ public class Car {
         currentLoad = 0;
         isGreed = true;
         isNeedDrop = false;
+    }
+
+    public void reachTarget() {
+        currentPoint = target;
+        currentVertex = targetVertext;
     }
 }

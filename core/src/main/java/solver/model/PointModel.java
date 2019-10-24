@@ -10,7 +10,11 @@ public class PointModel {
     private long id;
 
     @Getter
-    private long money;
+    private volatile long money;
+
+    @Getter
+    @Setter
+    private boolean processed;
 
     private int processingTime = 10;
 

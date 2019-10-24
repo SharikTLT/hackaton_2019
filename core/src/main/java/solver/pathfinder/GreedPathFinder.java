@@ -21,6 +21,7 @@ public class GreedPathFinder implements PathFinder {
     @Override
     public PointModel findNext(Solver solver, Car car) {
         Optional<EdgeModel> first = solver.getGraph().edgesOf(car.getCurrentVertex()).stream()
+                .filter((EdgeModel e)-> !e.getConnected(car.getCurrentVertex()).isProcessed())
                 .sorted(Comparator.comparing((e -> e.getTime())))
                 .limit(1)
                 .findFirst();
