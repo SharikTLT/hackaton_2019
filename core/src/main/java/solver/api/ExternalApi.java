@@ -48,7 +48,7 @@ public class ExternalApi extends AbstractApi implements Api {
     private volatile boolean routesReady = false;
 
     @Getter
-    private volatile Map<String,Double> trafficMap;
+    private volatile Map<String,Double> trafficMap = new ConcurrentHashMap<>();
     private volatile boolean trafficReady = false;
 
     @Getter
@@ -84,7 +84,9 @@ public class ExternalApi extends AbstractApi implements Api {
     }
 
     public void send(ApiOutput input) throws JsonProcessingException {
-        ws.send(objectMapper.writeValueAsString(input));
+        String message = objectMapper.writeValueAsString(input);
+        LOGGER.info("Send: {}", message);
+        ws.send(message);
     }
 
     public void onMessage(String message) {
@@ -99,14 +101,17 @@ public class ExternalApi extends AbstractApi implements Api {
     private void process(ApiInput input) {
         if (input.getPoints() != null) {
             this.pointList = input.getPoints();
+            this.pointsReady = true;
         }
 
         if (input.getRoutes() != null) {
             this.routeList = input.getRoutes();
+            this.routesReady = true;
         }
 
         if (input.getTraffic() != null) {
             parseTraffic(input.getTraffic());
+            this.trafficReady = true;
         }
 
         if(input.getToken() != null){
@@ -116,13 +121,17 @@ public class ExternalApi extends AbstractApi implements Api {
         if(input.getCar()!= null){
             onCarMessage(input);
         }
+
+        if(isReady() && solver != null) {
+            solver.solve();
+        }
     }
 
     private void onCarMessage(ApiInput input) {
         Car car = this.getCarMap().get(input.getCar());
         car.setCurrentLoad(input.getCarsum());
         car.updateLoad();
-        solver.solve();
+        car.reachTarget();
     }
 
     protected void parseTraffic(List<Traffic> trafficList) {
@@ -147,7 +156,11 @@ public class ExternalApi extends AbstractApi implements Api {
 
             @Override
             public void onMessage(String s) {
-                self.onMessage(s);
+                String[] split = s.split("\n");
+                for (String s1 : split) {
+                    self.onMessage(s1);
+                }
+
             }
 
             @Override

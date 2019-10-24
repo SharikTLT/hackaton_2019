@@ -20,28 +20,29 @@ public class SafePathFinder implements PathFinder {
 
     @Override
     public PointModel findNext(Solver solver, Car car) {
-        if(isNeedToDrop(car)){
+        if (isNeedToDrop(car)) {
             return getShortPathTo(solver, car);
         }
         shortPathAlgo = new DijkstraShortestPath(solver.getGraph());
 
         solver.getGraph().edgesOf(car.getCurrentVertex()).stream()
-        .sorted(Comparator.comparing(e -> {
+                .filter((EdgeModel e) -> !e.getConnected(car.getCurrentVertex()).isProcessed())
+                .sorted(Comparator.comparing(e -> {
 
-            return getLengthOfShortest(e.getConnected(car.getCurrentVertex()), solver.getBankPoint());
-        }));
+                    return getLengthOfShortest(e.getConnected(car.getCurrentVertex()), solver.getBankPoint());
+                }));
         return null;
     }
 
     private Long getLengthOfShortest(PointModel connected, PointModel bankPoint) {
         GraphPath<PointModel, EdgeModel> path = shortPathAlgo.getPath(connected, bankPoint);
         return new Double(path.getEdgeList().stream()
-                .mapToDouble(e->e.getTime())
+                .mapToDouble(e -> e.getTime())
                 .sum()).longValue();
     }
 
     private PointModel getShortPathTo(Solver solver, Car car) {
-        if(car.getPlannedPath() == null) {
+        if (car.getPlannedPath() == null) {
             GraphPath path = getShortest(solver, car);
             car.setPlannedPath(path);
         }
@@ -49,10 +50,10 @@ public class SafePathFinder implements PathFinder {
         List<PointModel> vertexList = car.getPlannedPath().getVertexList();
         boolean foundCurr = false;
         for (PointModel vert : vertexList) {
-            if(foundCurr){
+            if (foundCurr) {
                 return vert;
             }
-            if(vert == car.getCurrentVertex()){
+            if (vert == car.getCurrentVertex()) {
                 foundCurr = true;
             }
         }
@@ -65,7 +66,7 @@ public class SafePathFinder implements PathFinder {
     }
 
 
-    private boolean isNeedToDrop(Car car){
+    private boolean isNeedToDrop(Car car) {
         return car.isNeedDrop(); //TODO учет времени
     }
 }

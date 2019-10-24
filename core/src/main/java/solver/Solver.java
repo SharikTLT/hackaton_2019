@@ -37,6 +37,8 @@ public class Solver {
     @Setter
     private boolean run = true;
 
+    private volatile boolean ready = false;
+
 
     public Solver(Api api, GraphBuilder graphBuilder, PathFinder pathFinder) {
         this.api = api;
@@ -56,9 +58,11 @@ public class Solver {
         for (PointModel pointModel : graph.vertexSet()) {
             if(pointModel.getId() == 0){
                 garagePoint = pointModel;
+                garagePoint.setProcessed(true);
             }
             if(pointModel.getId() == 1){
                 bankPoint = pointModel;
+                bankPoint.setProcessed(true);
                 bankPoint.setDropPoint(true);
             }
 
@@ -69,10 +73,14 @@ public class Solver {
         for (Map.Entry<String, Car> entry : api.getCarMap().entrySet()) {
             entry.getValue().setCurrentVertex(garagePoint);
         }
+        ready = true;
         solve();
     }
 
     public void solve() {
+        if(!ready){
+            return;
+        }
         api.getCarMap().entrySet().stream().map(e -> e.getValue())
                 .filter(c -> c.notRun())
                 .forEach(c -> {
@@ -82,7 +90,12 @@ public class Solver {
 
     private void chooseNextPoint(Car c) {
         PointModel next = pathFinder.findNext(this, c);
+        if(next==null){
+            LOGGER.info("No points");
+        }
         try {
+            next.setProcessed(true);
+            c.setTargetVertext(next);
             api.goTo(c.getId(), next.getId(), false);
         } catch (JsonProcessingException e) {
             LOGGER.error(e.getMessage(), e);
