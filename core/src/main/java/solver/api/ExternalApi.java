@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ExternalApi implements Api {
+public class ExternalApi extends AbstractApi implements Api {
     private final static Logger LOGGER = LoggerFactory.getLogger(ExternalApi.class);
 
     public static final String WS_SOCKET = "ws://socket";
@@ -108,15 +108,11 @@ public class ExternalApi implements Api {
         }
     }
 
-    private void parseTraffic(List<Traffic> trafficList) {
+    protected void parseTraffic(List<Traffic> trafficList) {
         for (Traffic traffic : trafficList) {
             String key = getTrafficKey(traffic.getA(), traffic.getB());
             trafficMap.put(key, traffic.getJam());
         }
-    }
-
-    private String getTrafficKey(Long a, Long b) {
-        return a < b ? String.format(KEY_FORMAT, a, b) : String.format(KEY_FORMAT, b, a);
     }
 
     private WebSocketClient startWs(final ExternalApi self) throws URISyntaxException {

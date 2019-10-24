@@ -26,22 +26,22 @@ public class TestGraphBuilder implements GraphBuilder {
         graph.addVertex(pointMode4);
         graph.addVertex(pointMode5);
 
-        graph.addEdge(pointMode0, pointMode1, new EdgeModel(30));
-        graph.addEdge(pointMode0, pointMode2, new EdgeModel(10));
-        graph.addEdge(pointMode0, pointMode3, new EdgeModel(14));
-        graph.addEdge(pointMode0, pointMode4, new EdgeModel(12));
+        graph.addEdge(pointMode0, pointMode1, new EdgeModel(30, pointMode0, pointMode1));
+        graph.addEdge(pointMode0, pointMode2, new EdgeModel(10, pointMode0, pointMode2));
+        graph.addEdge(pointMode0, pointMode3, new EdgeModel(14, pointMode0, pointMode3));
+        graph.addEdge(pointMode0, pointMode4, new EdgeModel(12, pointMode0, pointMode4));
 
-        graph.addEdge(pointMode1, pointMode2, new EdgeModel(20));
-        graph.addEdge(pointMode1, pointMode3, new EdgeModel(11));
-        graph.addEdge(pointMode1, pointMode4, new EdgeModel(13));
-        graph.addEdge(pointMode1, pointMode5, new EdgeModel(40));
+        graph.addEdge(pointMode1, pointMode2, new EdgeModel(20, pointMode1, pointMode2));
+        graph.addEdge(pointMode1, pointMode3, new EdgeModel(11, pointMode1, pointMode3));
+        graph.addEdge(pointMode1, pointMode4, new EdgeModel(13, pointMode1, pointMode4));
+        graph.addEdge(pointMode1, pointMode5, new EdgeModel(40, pointMode1, pointMode5));
 
-        graph.addEdge(pointMode2, pointMode3, new EdgeModel(5));
-        graph.addEdge(pointMode2, pointMode5, new EdgeModel(10));
+        graph.addEdge(pointMode2, pointMode3, new EdgeModel(5, pointMode2, pointMode3));
+        graph.addEdge(pointMode2, pointMode5, new EdgeModel(10, pointMode2, pointMode5));
 
-        graph.addEdge(pointMode3, pointMode4, new EdgeModel(15));
+        graph.addEdge(pointMode3, pointMode4, new EdgeModel(15, pointMode3, pointMode4));
 
-        graph.addEdge(pointMode4, pointMode5, new EdgeModel(16));
+        graph.addEdge(pointMode4, pointMode5, new EdgeModel(16, pointMode4, pointMode5));
 
         return graph;
     }
