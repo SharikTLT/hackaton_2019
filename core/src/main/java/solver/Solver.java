@@ -83,6 +83,8 @@ public class Solver {
         solve();
     }
 
+    private volatile int count = 0;
+
     public void solve() {
         if(!ready){
             return;

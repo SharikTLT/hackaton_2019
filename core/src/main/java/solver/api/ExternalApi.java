@@ -36,6 +36,7 @@ public class ExternalApi extends AbstractApi implements Api {
     private ApiClient apiClient = new ApiClient();
 
     private WebSocketClient ws;
+    private volatile boolean isWsCreated;
 
     private ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
     ;
@@ -150,8 +151,14 @@ public class ExternalApi extends AbstractApi implements Api {
 
     private void restartWs() {
         try {
-            ws = startWs(this, url);
-            ws.connect();
+            synchronized (this) {
+                if (!isWsCreated) {
+                    LOGGER.info("Start socket");
+                    ws = startWs(this, url);
+                    ws.connect();
+                    isWsCreated = true;
+                }
+            }
         } catch (URISyntaxException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -176,6 +183,9 @@ public class ExternalApi extends AbstractApi implements Api {
 
             @Override
             public void onMessage(String s) {
+                if(self.ws != this){
+                    close();
+                }
                 String[] split = s.split("\n");
                 for (String s1 : split) {
                     self.onMessage(s1);
@@ -186,18 +196,22 @@ public class ExternalApi extends AbstractApi implements Api {
             @Override
             public void onClose(int i, String s, boolean b) {
                 LOGGER.error("Closed {} {} {}", i, s, b);
+                if(self.ws == this) {
+                    self.isWsCreated = false;
                 reconnectToRace();
+                }
             }
 
             @Override
             public void onError(Exception e) {
+                self.isWsCreated = false;
                 LOGGER.error(e.getMessage(), e);
                 reconnectToRace();
             }
 
             private void reconnectToRace() {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException ex) {
                 }
                 self.restartWs();
