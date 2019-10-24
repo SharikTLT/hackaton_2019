@@ -15,7 +15,7 @@ public class TestApi implements Api {
 
     @Override
     public boolean isReady() {
-        return false;
+        return true;
     }
 
     @Override
