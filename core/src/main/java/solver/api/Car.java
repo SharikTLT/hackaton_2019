@@ -59,7 +59,7 @@ public class Car {
     }
 
     public boolean notRun() {
-        return currentPoint != target;
+        return currentPoint == target;
     }
 
 
