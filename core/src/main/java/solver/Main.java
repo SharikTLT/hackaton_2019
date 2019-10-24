@@ -1,28 +1,28 @@
 package solver;
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import solver.api.Api;
 import solver.api.ExternalApi;
 import solver.http.ExternalGraphBuilder;
 import solver.pathfinder.RouterPathFinder;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class Main {
 
 
 
     public static void main(String[] args) throws Exception {
+        long maxLoad = 200_000L;
 
-        Api api = new ExternalApi("Лоцманы", "http://localhost:8080/race");
+        String initUrl = "http://localhost:8080/race";
+        //initUrl = "http://172.30.9.50:8080/race";
+        String teamName = "Лоцманы";
+        teamName = "Отладка";
+        Api api = new ExternalApi(teamName, initUrl);
 
         Solver solver = new Solver(api, new ExternalGraphBuilder(), new RouterPathFinder());
         api.setSolver(solver);
-        solver.start();
+        solver.setTotalTime(100);
+
+        solver.start(maxLoad);
 
         while (solver.isRun()){
             try {

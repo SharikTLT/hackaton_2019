@@ -38,7 +38,24 @@ public class EdgeModel extends DefaultWeightedEdge {
         return curr.equals(a) ? b : a;
     }
 
-    public double getTime(){
-        return api != null ? this.time *  api.getTime(a.getId(),b.getId()) : this.time;
+    public double getTime() {
+        return api != null ? this.time * api.getTime(a.getId(), b.getId()) : this.time;
+    }
+
+    @Override
+    public double getWeight() {
+        return getTime();
+    }
+
+    public double getWorstTime() {
+        return time * 2.;
+    }
+
+    @Override
+    public String toString() {
+        return "EdgeModel{" +
+                "a=" + a.getId() +
+                ", b=" + b.getId() +
+                ", t=" + getTime() + "}";
     }
 }

@@ -14,6 +14,9 @@ import solver.model.PointModel;
 import solver.pathfinder.PathFinder;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Solver {
 
@@ -41,7 +44,27 @@ public class Solver {
     @Setter
     private volatile long score;
 
+    @Getter
+    @Setter
+    private volatile long timeExist;
+
+    @Getter
+    @Setter
+    private volatile long totalTime;
+
+    @Getter
+    @Setter
+    private volatile Map<Long, PointModel> pointMap = new ConcurrentHashMap<>();
+
+    @Getter
+    @Setter
+    private volatile Set<PointModel> priority = new ConcurrentSkipListSet<>();
+
     private volatile boolean ready = false;
+
+    @Getter
+    @Setter
+    private volatile boolean isShuffle = false;
 
 
     public Solver(Api api, GraphBuilder graphBuilder, PathFinder pathFinder) {
@@ -50,7 +73,7 @@ public class Solver {
         this.pathFinder = pathFinder;
     }
 
-    public void start() {
+    public void start(long maxLoad) {
         while (!api.isReady()) {
             try {
                 Thread.sleep(1000);
@@ -60,37 +83,36 @@ public class Solver {
         }
         graph = graphBuilder.buildGraph(api);
         for (PointModel pointModel : graph.vertexSet()) {
-            if(pointModel.getId() == 0){
+            pointMap.put(pointModel.getId(), pointModel);
+            if (pointModel.getId() == 0) {
                 garagePoint = pointModel;
                 garagePoint.setProcessed(true);
             }
-            if(pointModel.getId() == 1){
+            if (pointModel.getId() == 1) {
                 bankPoint = pointModel;
                 bankPoint.setProcessed(true);
                 bankPoint.setDropPoint(true);
             }
 
-            if(garagePoint != null && bankPoint != null){
+            if (garagePoint != null && bankPoint != null) {
                 break;
             }
         }
         for (Map.Entry<String, Car> entry : api.getCarMap().entrySet()) {
             Car car = entry.getValue();
-            car.setMaxLoad(100_000L);
+            car.setMaxLoad(maxLoad);
             car.setCurrentVertex(garagePoint);
         }
         ready = true;
         solve();
     }
 
-    private volatile int count = 0;
-
-    public void solve() {
-        if(!ready){
+    public synchronized void solve() {
+        if (!ready) {
             return;
         }
         api.getCarMap().entrySet().stream().map(e -> e.getValue())
-                .filter(c -> c.notRun())
+                .filter(c -> c.notRun() && !c.isParked())
                 .forEach(c -> {
                     chooseNextPoint(c);
                 });
@@ -98,12 +120,21 @@ public class Solver {
 
     private void chooseNextPoint(Car c) {
         PointModel next = pathFinder.findNext(this, c);
-        if(next==null){
-            LOGGER.info("No points");
+        if (next == null) {
+            LOGGER.info("No points, park car {} with result: {} time: {}", c.getId(), c.getDelivered(), c.getSpendedTime());
+            c.setTravelTime(0);
+            c.setParked(true);
+            return;
         }
         try {
             next.setProcessed(true);
+            if (priority.contains(next)) {
+                priority.remove(next);
+            }
             c.setTargetVertext(next);
+            EdgeModel edge = graph.getEdge(c.getCurrentVertex(), c.getTargetVertext());
+            double ceiled = Math.ceil(edge.getTime());
+            c.setTravelTime(Double.valueOf(ceiled).longValue());
             api.goTo(c.getId(), next.getId(), false);
         } catch (JsonProcessingException e) {
             LOGGER.error(e.getMessage(), e);

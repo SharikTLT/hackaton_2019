@@ -16,8 +16,6 @@ public class PointModel {
     @Setter
     private boolean processed;
 
-    private int processingTime = 10;
-
     @Getter
     @Setter
     private boolean dropPoint;

@@ -15,19 +15,22 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SafePathFinder implements PathFinder {
+public class SafePathFinder extends AbstractPathFinder {
 
-    private ShortestPathAlgorithm shortPathAlgo;
+
 
     @Override
     public PointModel findNext(Solver solver, Car car) {
+        setUpAlgo(solver);
+
         if (isNeedToDrop(car)) {
             return getShortPathTo(solver, car);
         }
-        shortPathAlgo = new DijkstraShortestPath(solver.getGraph());
+
 
         Object[] candidates = solver.getGraph().edgesOf(car.getCurrentVertex()).stream()
-
+                .sorted(Comparator.comparing(e -> e.getTime()))
+                .limit(5)
                 .map(e -> e.getConnected(car.getCurrentVertex()))
                 .filter(p -> !p.isProcessed())
                 .sorted(Comparator.comparing(e -> getLengthOfShortest(e, solver.getBankPoint())))
@@ -42,12 +45,7 @@ public class SafePathFinder implements PathFinder {
         return connected;
     }
 
-    private Long getLengthOfShortest(PointModel connected, PointModel bankPoint) {
-        GraphPath<PointModel, EdgeModel> path = shortPathAlgo.getPath(connected, bankPoint);
-        return new Double(path.getEdgeList().stream()
-                .mapToDouble(e -> e.getTime())
-                .sum()).longValue();
-    }
+
 
     private PointModel getShortPathTo(Solver solver, Car car) {
         if (car.getPlannedPath() == null) {
@@ -68,10 +66,7 @@ public class SafePathFinder implements PathFinder {
         return solver.getBankPoint();
     }
 
-    private GraphPath getShortest(Solver solver, Car car) {
 
-        return shortPathAlgo.getPath(car.getCurrentVertex(), solver.getBankPoint());
-    }
 
 
     private boolean isNeedToDrop(Car car) {

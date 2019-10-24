@@ -52,6 +52,21 @@ public class Car {
     @Getter
     volatile boolean isNeedDrop = false;
 
+    @Getter
+    @Setter
+    volatile boolean isParked = false;
+
+    @Getter
+    @Setter
+    volatile long spendedTime = 0;
+
+    @Getter
+    @Setter
+    volatile long travelTime;
+
+    @Getter
+    volatile long delivered;
+
     private long greedFactor = 2;
 
     @Getter
@@ -91,6 +106,7 @@ public class Car {
     }
 
     public void drop() {
+        delivered+=currentLoad;
         currentLoad = 0;
         isGreed = true;
         isNeedDrop = false;
@@ -98,13 +114,15 @@ public class Car {
 
     public void reachTarget() {
         path.add(target);
-        LOGGER.info(path.toString());
         currentPoint = target;
         currentVertex = targetVertext;
         currentLoad += targetVertext.getMoney();
+        spendedTime += travelTime;
         if(currentVertex.isDropPoint()){
             drop();
         }
+        LOGGER.info("Spended: {}, Delivered: {}, Path: {}",spendedTime, delivered, path.toString());
+        updateLoad();
     }
 
     public boolean canLoad(long money) {

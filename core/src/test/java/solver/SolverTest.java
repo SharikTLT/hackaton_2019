@@ -6,7 +6,6 @@ import solver.api.ExampleApi;
 import solver.api.TestApi;
 import solver.http.ExternalGraphBuilder;
 import solver.http.TestGraphBuilder;
-import solver.pathfinder.PathFinder;
 import solver.pathfinder.RouterPathFinder;
 
 import java.io.IOException;
@@ -17,14 +16,14 @@ import static org.testng.Assert.assertEquals;
 public class SolverTest {
     public static void main(String[] args) {
         Solver solver = new Solver(new TestApi(), new TestGraphBuilder(), new RouterPathFinder());
-        solver.start();
+        solver.start(100_000L);
     }
 
     @Test
     public void test() throws IOException {
         Api api = new ExampleApi();
         Solver solver = new Solver(api, new ExternalGraphBuilder(), new RouterPathFinder());
-        solver.start();
+        solver.start(100_000L);
         // Solver solver = new Solver();
 
     }

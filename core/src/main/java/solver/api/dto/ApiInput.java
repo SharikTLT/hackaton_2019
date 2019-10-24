@@ -47,4 +47,11 @@ public class ApiInput {
     @Setter
     Long teamsum;
 
+    @Getter
+    @Setter
+    List<PointsUpdate> pointsupdate;
+
+    public Long getExistTime() {
+        return null;
+    }
 }

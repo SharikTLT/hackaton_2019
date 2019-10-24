@@ -7,9 +7,11 @@ import java.util.List;
 
 public abstract class AbstractApi implements Api{
 
+    public static final String KEY_FORMAT = "%d_%d";
 
-    protected String getTrafficKey(Long a, Long b) {
-        return a < b ? String.format(ExternalApi.KEY_FORMAT, a, b) : String.format(ExternalApi.KEY_FORMAT, b, a);
+    //@Override
+    public String getTrafficKey(long a, long b) {
+        return a < b ? String.format(KEY_FORMAT, a, b) : String.format(KEY_FORMAT, b, a);
     }
 
     @Override

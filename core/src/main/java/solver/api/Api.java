@@ -18,5 +18,9 @@ public interface Api {
 
     void setSolver(Solver solver);
 
+    //Solver getSolver();
+
     double getTime(long id, long id1);
+
+    //String getTrafficKey(long id1, long id2);
 }

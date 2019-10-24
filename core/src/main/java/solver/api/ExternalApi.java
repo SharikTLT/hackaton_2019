@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import solver.Solver;
 import solver.api.dto.*;
 import solver.http.ApiClient;
+import solver.model.PointModel;
 
 import java.io.IOException;
 import java.net.URI;
@@ -27,7 +28,7 @@ public class ExternalApi extends AbstractApi implements Api {
     public static final String WS_SOCKET = "ws://socket";
 
     public static final String INIT_URL = "/init";
-    public static final String KEY_FORMAT = "%d_%d";
+
 
     private String teamName;
 
@@ -130,16 +131,45 @@ public class ExternalApi extends AbstractApi implements Api {
             solver.setScore(input.getTeamsum());
         }
 
+        if (input.getPointsupdate() != null) {
+            updatePoints(input.getPointsupdate());
+        }
+
         if (isReady() && solver != null) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+            }
             solver.solve();
+        }
+    }
+
+    private void updatePoints(List<PointsUpdate> pointsupdate) {
+        for (PointsUpdate pointsUpdate : pointsupdate) {
+            if (pointsUpdate.getDisable()) {
+                solver.getPointMap().get(pointsUpdate.getP()).setProcessed(true);
+            }
+
+            if (pointsUpdate.getPriority() != null) {
+                PointModel pointModel = solver.getPointMap().get(pointsUpdate.getP());
+                if (pointsUpdate.getPriority() && !pointModel.isProcessed() && !solver.getPriority().contains(pointModel)) {
+                    solver.getPriority().add(pointModel);
+                } else {
+                    solver.getPriority().remove(pointModel);
+                }
+            }
         }
     }
 
     private void onCarMessage(ApiInput input) {
         Car car = this.getCarMap().get(input.getCar());
-        //car.setCurrentLoad(input.getCarsum());
         car.reachTarget();
-        car.updateLoad();
+        if(input.getExistTime() != null){
+            solver.setTimeExist(input.getExistTime());
+        }else{
+            solver.setTimeExist(solver.getTotalTime() - car.getSpendedTime());
+        }
+        LOGGER.info("Times left: {}", solver.getTimeExist());
     }
 
     protected void parseTraffic(List<Traffic> trafficList) {
@@ -155,8 +185,8 @@ public class ExternalApi extends AbstractApi implements Api {
                 if (!isWsCreated) {
                     LOGGER.info("Start socket");
                     ws = startWs(this, url);
-                    ws.connect();
                     isWsCreated = true;
+                    ws.connect();
                 }
             }
         } catch (URISyntaxException e) {
@@ -183,7 +213,7 @@ public class ExternalApi extends AbstractApi implements Api {
 
             @Override
             public void onMessage(String s) {
-                if(self.ws != this){
+                if (self.ws != this) {
                     close();
                 }
                 String[] split = s.split("\n");
@@ -196,17 +226,19 @@ public class ExternalApi extends AbstractApi implements Api {
             @Override
             public void onClose(int i, String s, boolean b) {
                 LOGGER.error("Closed {} {} {}", i, s, b);
-                if(self.ws == this) {
+                if (self.ws == this) {
                     self.isWsCreated = false;
-                reconnectToRace();
+                    reconnectToRace();
                 }
             }
 
             @Override
             public void onError(Exception e) {
-                self.isWsCreated = false;
                 LOGGER.error(e.getMessage(), e);
-                reconnectToRace();
+                if (self.ws == this) {
+                    self.isWsCreated = false;
+                    reconnectToRace();
+                }
             }
 
             private void reconnectToRace() {
