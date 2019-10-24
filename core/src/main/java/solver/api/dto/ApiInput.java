@@ -21,4 +21,16 @@ public class ApiInput {
 
     @Getter @Setter
     String car;
+
+    @Getter
+    @Setter
+    String token;
+
+    @Getter
+    @Setter
+    List<String> cars;
+
+    @Getter
+    @Setter
+    Long level;
 }

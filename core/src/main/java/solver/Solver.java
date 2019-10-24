@@ -12,6 +12,8 @@ import solver.model.EdgeModel;
 import solver.model.PointModel;
 import solver.pathfinder.PathFinder;
 
+import java.util.Map;
+
 public class Solver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Solver.class);
@@ -28,9 +30,12 @@ public class Solver {
     @Getter
     private PointModel bankPoint;
 
-    public Solver(Api api, GraphBuilder graphBuilder) {
+    private PointModel garagePoint;
+
+    public Solver(Api api, GraphBuilder graphBuilder, PathFinder pathFinder) {
         this.api = api;
         this.graphBuilder = graphBuilder;
+        this.pathFinder = pathFinder;
     }
 
     public void start() {
@@ -42,8 +47,22 @@ public class Solver {
             }
         }
         graph = graphBuilder.buildGraph(api);
-        graph.vertexSet().stream().filter(p -> p.getId() == 1)
-                .forEach(p -> bankPoint = p);
+        for (PointModel pointModel : graph.vertexSet()) {
+            if(pointModel.getId() == 0){
+                garagePoint = pointModel;
+            }
+            if(pointModel.getId() == 1){
+                bankPoint = pointModel;
+                bankPoint.setDropPoint(true);
+            }
+
+            if(garagePoint != null && bankPoint != null){
+                break;
+            }
+        }
+        for (Map.Entry<String, Car> entry : api.getCarMap().entrySet()) {
+            entry.getValue().setCurrentVertex(garagePoint);
+        }
         solve();
     }
 

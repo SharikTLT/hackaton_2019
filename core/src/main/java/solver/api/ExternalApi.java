@@ -53,17 +53,17 @@ public class ExternalApi extends AbstractApi implements Api {
 
     private volatile Long level;
 
-    public ExternalApi(String teamName) throws Exception {
-        Optional<InitialResponse> res = apiClient.post(INIT_URL, new InitialRequest(teamName), InitialResponse.class);
+    public ExternalApi(String teamName, String initUrl) throws Exception {
+        /*Optional<InitialResponse> res = apiClient.post(initUrl, new InitialRequest(teamName), InitialResponse.class);
         if (!res.isPresent()) {
             LOGGER.error("No answer from initial request");
             throw new Exception("no answer");
         }
         InitialResponse apiRes = res.get();
-        parseCars(apiRes.getCars());
+
         this.level = apiRes.getLevel();
-        this.token = apiRes.getToken();
-        ws = startWs(this);
+        this.token = apiRes.getToken();*/
+        ws = startWs(this, initUrl);
     }
 
     private void parseCars(List<String> cars) {
@@ -106,6 +106,11 @@ public class ExternalApi extends AbstractApi implements Api {
         if (input.getTraffic() != null) {
             parseTraffic(input.getTraffic());
         }
+
+        if(input.getToken() != null){
+            this.token = input.getToken();
+            parseCars(input.getCars());
+        }
     }
 
     protected void parseTraffic(List<Traffic> trafficList) {
@@ -115,9 +120,9 @@ public class ExternalApi extends AbstractApi implements Api {
         }
     }
 
-    private WebSocketClient startWs(final ExternalApi self) throws URISyntaxException {
+    private WebSocketClient startWs(final ExternalApi self, String initUrl) throws URISyntaxException {
 
-        return new WebSocketClient(new URI(WS_SOCKET)) {
+        return new WebSocketClient(new URI(initUrl)) {
             @Override
             public void onOpen(ServerHandshake serverHandshake) {
                 LOGGER.info("Connected");
@@ -142,6 +147,6 @@ public class ExternalApi extends AbstractApi implements Api {
 
     @Override
     public boolean isReady() {
-        return trafficReady && routesReady && pointsReady;
+        return trafficReady && routesReady && pointsReady && token != null;
     }
 }

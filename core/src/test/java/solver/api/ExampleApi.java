@@ -2,6 +2,8 @@ package solver.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import solver.api.dto.ApiInput;
 import solver.api.dto.Point;
 import solver.api.dto.Route;
@@ -14,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ExampleApi extends AbstractApi {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExampleApi.class);
     private List<Route> routeList;
     private List<Point> pointList;
     private Map<String, Double> trafficMap = new HashMap<>();
@@ -36,7 +38,7 @@ public class ExampleApi extends AbstractApi {
 
     @Override
     public void goTo(String car, Long target, boolean noMoney) throws JsonProcessingException {
-
+        LOGGER.info("Car {} to {} {}", car, target, noMoney);
     }
 
     @Override
