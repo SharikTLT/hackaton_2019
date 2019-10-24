@@ -1,12 +1,15 @@
 package solver.api;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import lombok.Setter;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import solver.Solver;
 import solver.api.dto.*;
 import solver.http.ApiClient;
 
@@ -34,7 +37,7 @@ public class ExternalApi extends AbstractApi implements Api {
 
     private WebSocketClient ws;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);;
 
     @Getter
     private volatile List<Point> pointList;
@@ -53,17 +56,15 @@ public class ExternalApi extends AbstractApi implements Api {
 
     private volatile Long level;
 
-    public ExternalApi(String teamName, String initUrl) throws Exception {
-        /*Optional<InitialResponse> res = apiClient.post(initUrl, new InitialRequest(teamName), InitialResponse.class);
-        if (!res.isPresent()) {
-            LOGGER.error("No answer from initial request");
-            throw new Exception("no answer");
-        }
-        InitialResponse apiRes = res.get();
+    @Getter
+    @Setter
+    private volatile Solver solver;
 
-        this.level = apiRes.getLevel();
-        this.token = apiRes.getToken();*/
+    public ExternalApi(String teamName, String initUrl) throws Exception {
+        this.teamName = teamName;
         ws = startWs(this, initUrl);
+        ws.connect();
+        LOGGER.info("Start solver");
     }
 
     private void parseCars(List<String> cars) {
@@ -88,6 +89,7 @@ public class ExternalApi extends AbstractApi implements Api {
 
     public void onMessage(String message) {
         try {
+            LOGGER.info("Got message: {}", message);
             process(objectMapper.readValue(message, ApiInput.class));
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
@@ -111,6 +113,16 @@ public class ExternalApi extends AbstractApi implements Api {
             this.token = input.getToken();
             parseCars(input.getCars());
         }
+        if(input.getCar()!= null){
+            onCarMessage(input);
+        }
+    }
+
+    private void onCarMessage(ApiInput input) {
+        Car car = this.getCarMap().get(input.getCar());
+        car.setCurrentLoad(input.getCarsum());
+        car.updateLoad();
+        solver.solve();
     }
 
     protected void parseTraffic(List<Traffic> trafficList) {
@@ -126,6 +138,11 @@ public class ExternalApi extends AbstractApi implements Api {
             @Override
             public void onOpen(ServerHandshake serverHandshake) {
                 LOGGER.info("Connected");
+                try {
+                    self.send(ApiOutput.init(teamName));
+                } catch (JsonProcessingException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
 
             @Override

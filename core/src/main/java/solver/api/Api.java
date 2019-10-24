@@ -1,6 +1,7 @@
 package solver.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import solver.Solver;
 
 public interface Api {
     void goTo(String car, Long target, boolean noMoney) throws JsonProcessingException;
@@ -14,4 +15,6 @@ public interface Api {
     java.util.Map<String, Double> getTrafficMap();
 
     java.util.Map<String, Car> getCarMap();
+
+    void setSolver(Solver solver);
 }

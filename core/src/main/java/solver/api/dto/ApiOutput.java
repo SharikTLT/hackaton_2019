@@ -1,7 +1,6 @@
 package solver.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,6 +24,10 @@ public class ApiOutput {
     @Setter
     String token;
 
+    @Getter
+    @Setter
+    String team;
+
     public ApiOutput() {
     }
 
@@ -39,19 +42,25 @@ public class ApiOutput {
         this.nomoney = nomoney;
     }
 
-    public ApiOutput(String token){
+    public ApiOutput(String token) {
         this.token = token;
     }
 
-    public static ApiOutput goTo(Long point, String car){
+    public static ApiOutput goTo(Long point, String car) {
         return new ApiOutput(point, car);
     }
 
-    public static ApiOutput goTo(Long point, String car, Boolean nomoney){
+    public static ApiOutput goTo(Long point, String car, Boolean nomoney) {
         return new ApiOutput(point, car, nomoney);
     }
 
-    public static ApiOutput reconnect(String token){
+    public static ApiOutput reconnect(String token) {
         return new ApiOutput(token);
+    }
+
+    public static ApiOutput init(String teamName){
+        ApiOutput apiOutput = new ApiOutput();
+        apiOutput.setTeam(teamName);
+        return apiOutput;
     }
 }

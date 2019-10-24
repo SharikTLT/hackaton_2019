@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import solver.api.Api;
 import solver.api.ExternalApi;
+import solver.http.ExternalGraphBuilder;
+import solver.pathfinder.RouterPathFinder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,8 +20,17 @@ public class Main {
 
         Api api = new ExternalApi("Лоцманы", "http://localhost:8080/race");
 
-        //Solver solver = new Solver()
+        Solver solver = new Solver(api, new ExternalGraphBuilder(), new RouterPathFinder());
+        api.setSolver(solver);
+        solver.start();
 
+        while (solver.isRun()){
+            try {
+                Thread.sleep(1000);
+            }catch (Exception e){
+
+            }
+        }
     }
 
 

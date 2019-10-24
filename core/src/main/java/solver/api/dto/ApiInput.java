@@ -33,4 +33,9 @@ public class ApiInput {
     @Getter
     @Setter
     Long level;
+
+    @Getter
+    @Setter
+    Long carsum;
+
 }

@@ -2,6 +2,7 @@ package solver;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
+import lombok.Setter;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,11 @@ public class Solver {
     private PointModel bankPoint;
 
     private PointModel garagePoint;
+
+    @Getter
+    @Setter
+    private boolean run = true;
+
 
     public Solver(Api api, GraphBuilder graphBuilder, PathFinder pathFinder) {
         this.api = api;
@@ -66,7 +72,7 @@ public class Solver {
         solve();
     }
 
-    private void solve() {
+    public void solve() {
         api.getCarMap().entrySet().stream().map(e -> e.getValue())
                 .filter(c -> c.notRun())
                 .forEach(c -> {

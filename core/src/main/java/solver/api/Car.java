@@ -65,6 +65,10 @@ public class Car {
 
     public void load(long value) {
         currentLoad += value;
+        updateLoad();
+    }
+
+    public void updateLoad(){
         if (currentLoad > maxLoad / greedFactor) {
             isGreed = false;
         }
