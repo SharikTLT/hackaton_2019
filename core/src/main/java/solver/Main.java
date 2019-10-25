@@ -11,11 +11,11 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         long maxLoad = 1_000_000L;
-        int totalTime = 6000;
+        int totalTime = 480;
 
         String initUrl = "http://localhost:8080/race";
-        initUrl = "http://172.30.9.50:8080/race";
-        initUrl = "http://localhost:8080/race";
+        //initUrl = "http://172.30.9.50:8080/race";
+        //initUrl = "http://localhost:3000/race";
         String teamName = "Лоцманы";
         //teamName = "Отладка";
         Api api = new ExternalApi(teamName, initUrl);

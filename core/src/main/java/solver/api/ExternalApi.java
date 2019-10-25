@@ -115,6 +115,7 @@ public class ExternalApi extends AbstractApi implements Api {
         }
 
         if (input.getTraffic() != null) {
+            solver.setEnd(false);
             parseTraffic(input.getTraffic());
             this.trafficReady = true;
         }
@@ -124,6 +125,8 @@ public class ExternalApi extends AbstractApi implements Api {
             parseCars(input.getCars());
         }
         if (input.getPoint() != null && input.getCarsum() != null) {
+            solver.setEnd(false);
+            carMap.get(input.getCar()).setParked(false);
             onCarMessage(input);
         }
 
@@ -133,6 +136,10 @@ public class ExternalApi extends AbstractApi implements Api {
 
         if (input.getPointsupdate() != null) {
             updatePoints(input.getPointsupdate());
+        }
+
+        if(input.getErrorMessage() != null){
+            solver.setEnd(true);
         }
 
         if(input.isEnd()){
@@ -171,7 +178,7 @@ public class ExternalApi extends AbstractApi implements Api {
         if(input.getExistTime() != null){
             solver.setTimeExist(input.getExistTime());
         }else{
-            solver.setTimeExist(solver.getTotalTime() - car.getSpendedTime());
+            solver.setTimeExist(car.isIncreaseDuration() ? solver.getTotalTime() - car.getSpendedTime() : car.getSpendedTime());
         }
         LOGGER.info("Times left: {}", solver.getTimeExist());
     }
@@ -187,7 +194,7 @@ public class ExternalApi extends AbstractApi implements Api {
         try {
             synchronized (this) {
                 if (!isWsCreated) {
-                    LOGGER.info("Start socket");
+                    LOGGER.info("Start socket on {}", url);
                     ws = startWs(this, url);
                     isWsCreated = true;
                     ws.connect();

@@ -59,6 +59,10 @@ public class ApiInput {
     @Setter
     Double duration;
 
+    @Getter
+    @Setter
+    String ErrorMessage;
+
     public Long getExistTime() {
         return null;
     }

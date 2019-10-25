@@ -38,7 +38,8 @@ public class GreedPathFinder extends AbstractPathFinder {
         List<EdgeModel> edges = solver.getGraph().edgesOf(car.getCurrentVertex()).stream()
                 .filter((EdgeModel e)-> !e.getConnected(car.getCurrentVertex()).isProcessed())
                 .sorted(Comparator.comparing((e -> e.getTime())))
-                .limit(3)
+                .limit(20)
+                .sorted(Comparator.comparing((EdgeModel e)->e.getConnected(car.getCurrentVertex()).getMoney()).reversed())
                 .collect(Collectors.toList());
 
         if(solver.isShuffle()) {

@@ -75,6 +75,8 @@ public class Car {
 
     volatile private double doubleTime;
 
+    volatile private double lastTime;
+
     volatile ConcurrentLinkedQueue<Long> path = new ConcurrentLinkedQueue<Long>();
 
 
@@ -120,14 +122,15 @@ public class Car {
         currentVertex = targetVertext;
         currentLoad += targetVertext.getMoney();
         if(duration != null){
-            doubleTime += duration;
+            lastTime = doubleTime;
+            doubleTime = duration;
         }else {
             spendedTime += travelTime;
         }
         if(currentVertex.isDropPoint()){
             drop();
         }
-        LOGGER.info("Spended: {}, Delivered: {}, Path: {}", getSpendedTime(), delivered, path.toString());
+        LOGGER.info("[{}] Spended: {}, Delivered: {}, Path: {}", id, getSpendedTime(), delivered, path.toString());
         updateLoad();
     }
 
@@ -140,5 +143,9 @@ public class Car {
             return Double.valueOf(Math.ceil(doubleTime)).longValue();
         }
         return spendedTime;
+    }
+
+    public boolean isIncreaseDuration(){
+        return lastTime < doubleTime;
     }
 }
