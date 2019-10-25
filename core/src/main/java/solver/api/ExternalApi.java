@@ -74,7 +74,9 @@ public class ExternalApi extends AbstractApi implements Api {
 
     private void parseCars(List<String> cars) {
         for (String car : cars) {
-            this.carMap.put(car, new Car(car, 0));
+            if(carMap.size() < 6) {
+                this.carMap.put(car, new Car(car, 0));
+            }
         }
     }
 
@@ -107,6 +109,7 @@ public class ExternalApi extends AbstractApi implements Api {
         if (input.getPoints() != null) {
             this.pointList = input.getPoints();
             this.pointsReady = true;
+            solver.setEnd(false);
         }
 
         if (input.getRoutes() != null) {
@@ -142,9 +145,7 @@ public class ExternalApi extends AbstractApi implements Api {
             solver.setEnd(true);
         }
 
-        if(input.isEnd()){
-            solver.setEnd(true);
-        }
+
 
         if (isReady() && solver != null) {
             try {

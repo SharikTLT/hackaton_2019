@@ -135,7 +135,7 @@ public class Car {
     }
 
     public boolean canLoad(long money) {
-        return currentLoad + money <= maxLoad;
+        return currentLoad + money <= maxLoad*0.85;
     }
 
     public long getSpendedTime(){

@@ -60,6 +60,7 @@ public class Solver {
     @Setter
     private volatile Set<PointModel> priority = new ConcurrentSkipListSet<>();
 
+    @Setter
     private volatile boolean ready = false;
 
     @Getter

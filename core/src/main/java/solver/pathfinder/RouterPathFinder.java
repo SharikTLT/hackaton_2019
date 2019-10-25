@@ -27,6 +27,6 @@ public class RouterPathFinder extends AbstractPathFinder{
     private boolean cantGetBack(Solver solver, Car car, PointModel next) {
         long toPoint = getLengthOfWorstShortest(car.getCurrentVertex(), next);
         long toBank = getLengthOfWorstShortest(next, solver.getBankPoint());
-        return toPoint + toBank > solver.getTimeExist()*0.8;
+        return toPoint + toBank > solver.getTimeExist()*(0.9);
     }
 }
