@@ -73,6 +73,8 @@ public class Car {
     @Setter
     volatile private GraphPath plannedPath;
 
+    volatile private double doubleTime;
+
     volatile ConcurrentLinkedQueue<Long> path = new ConcurrentLinkedQueue<Long>();
 
 
@@ -112,20 +114,31 @@ public class Car {
         isNeedDrop = false;
     }
 
-    public void reachTarget() {
+    public void reachTarget(Double duration) {
         path.add(target);
         currentPoint = target;
         currentVertex = targetVertext;
         currentLoad += targetVertext.getMoney();
-        spendedTime += travelTime;
+        if(duration != null){
+            doubleTime += duration;
+        }else {
+            spendedTime += travelTime;
+        }
         if(currentVertex.isDropPoint()){
             drop();
         }
-        LOGGER.info("Spended: {}, Delivered: {}, Path: {}",spendedTime, delivered, path.toString());
+        LOGGER.info("Spended: {}, Delivered: {}, Path: {}", getSpendedTime(), delivered, path.toString());
         updateLoad();
     }
 
     public boolean canLoad(long money) {
         return currentLoad + money <= maxLoad;
+    }
+
+    public long getSpendedTime(){
+        if(doubleTime > 0){
+            return Double.valueOf(Math.ceil(doubleTime)).longValue();
+        }
+        return spendedTime;
     }
 }

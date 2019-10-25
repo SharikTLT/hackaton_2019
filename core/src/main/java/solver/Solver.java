@@ -46,7 +46,7 @@ public class Solver {
 
     @Getter
     @Setter
-    private volatile long timeExist;
+    private volatile long timeExist = 1000_000_000;
 
     @Getter
     @Setter
@@ -65,6 +65,10 @@ public class Solver {
     @Getter
     @Setter
     private volatile boolean isShuffle = false;
+
+    @Getter
+    @Setter
+    private volatile boolean isEnd = false;
 
 
     public Solver(Api api, GraphBuilder graphBuilder, PathFinder pathFinder) {
@@ -120,7 +124,7 @@ public class Solver {
 
     private void chooseNextPoint(Car c) {
         PointModel next = pathFinder.findNext(this, c);
-        if (next == null) {
+        if (isEnd || next == null) {
             LOGGER.info("No points, park car {} with result: {} time: {}", c.getId(), c.getDelivered(), c.getSpendedTime());
             c.setTravelTime(0);
             c.setParked(true);
@@ -140,4 +144,5 @@ public class Solver {
             LOGGER.error(e.getMessage(), e);
         }
     }
+
 }

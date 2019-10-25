@@ -10,17 +10,19 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        long maxLoad = 200_000L;
+        long maxLoad = 1_000_000L;
+        int totalTime = 6000;
 
         String initUrl = "http://localhost:8080/race";
-        //initUrl = "http://172.30.9.50:8080/race";
+        initUrl = "http://172.30.9.50:8080/race";
+        initUrl = "http://localhost:8080/race";
         String teamName = "Лоцманы";
         //teamName = "Отладка";
         Api api = new ExternalApi(teamName, initUrl);
 
         Solver solver = new Solver(api, new ExternalGraphBuilder(), new RouterPathFinder());
         api.setSolver(solver);
-        solver.setTotalTime(100);
+        solver.setTotalTime(totalTime);
 
         solver.start(maxLoad);
 

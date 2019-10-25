@@ -26,7 +26,10 @@ public class ExternalGraphBuilder implements GraphBuilder {
         });
 
         Point bankPointVar = api.getPointList().get(1);
-        pointMap.get(bankPointVar.getP()).setDropPoint(true);
+        PointModel bankModel = pointMap.get(bankPointVar.getP());
+        bankModel.setDropPoint(true);
+        bankModel.setProcessed(true);
+
 
         api.getRouteList().stream().forEach(r -> {
             PointModel a = pointMap.get(r.getA());

@@ -51,6 +51,14 @@ public class ApiInput {
     @Setter
     List<PointsUpdate> pointsupdate;
 
+    @Getter
+    @Setter
+    boolean end;
+
+    @Getter
+    @Setter
+    Double duration;
+
     public Long getExistTime() {
         return null;
     }

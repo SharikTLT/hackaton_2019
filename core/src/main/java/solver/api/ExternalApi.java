@@ -123,7 +123,7 @@ public class ExternalApi extends AbstractApi implements Api {
             this.token = input.getToken();
             parseCars(input.getCars());
         }
-        if (input.getCar() != null) {
+        if (input.getPoint() != null && input.getCarsum() != null) {
             onCarMessage(input);
         }
 
@@ -133,6 +133,10 @@ public class ExternalApi extends AbstractApi implements Api {
 
         if (input.getPointsupdate() != null) {
             updatePoints(input.getPointsupdate());
+        }
+
+        if(input.isEnd()){
+            solver.setEnd(true);
         }
 
         if (isReady() && solver != null) {
@@ -163,7 +167,7 @@ public class ExternalApi extends AbstractApi implements Api {
 
     private void onCarMessage(ApiInput input) {
         Car car = this.getCarMap().get(input.getCar());
-        car.reachTarget();
+        car.reachTarget(input.getDuration());
         if(input.getExistTime() != null){
             solver.setTimeExist(input.getExistTime());
         }else{
